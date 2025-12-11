@@ -1,16 +1,16 @@
 enum UserRole { user, admin }
 
 class Member {
-  final String id;
-  final String uid;
+  final String? id;
+  final String? uid;
   final String name;
   final String email;
   final UserRole userRole;
   final DateTime timestamp;
 
   Member({
-    required this.id,
-    required this.uid,
+    this.id,
+    this.uid,
     required this.name,
     required this.email,
     required this.userRole,
