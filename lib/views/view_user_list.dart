@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
-import 'package:flutter_application_mms/service/service_list.dart';
+import 'package:flutter_application_mms/service/service_member.dart';
 
 class MainListView extends StatefulWidget {
   const MainListView({super.key});
