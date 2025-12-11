@@ -1,11 +1,14 @@
 class Member {
-  String id;
-  String name;
-  String email;
-  DateTime timestamp;
+  final String id;
+  final String uid;
+  final String name;
+  final String email;
+
+  final DateTime timestamp;
 
   Member({
     required this.id,
+    this.uid = '',
     required this.name,
     required this.email,
     required this.timestamp,
