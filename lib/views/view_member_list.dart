@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
 import 'package:flutter_application_mms/service/service_member.dart';
-import 'package:flutter_application_mms/views/view_dialogs.dart';
+import 'package:flutter_application_mms/dialog/dialogs.dart';
 import 'package:intl/intl.dart';
 
 class UserListView extends StatefulWidget {
