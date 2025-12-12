@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
 import 'package:flutter_application_mms/service/service_member.dart';
 import 'package:flutter_application_mms/views/view_dialogs.dart';
-import 'package:flutter_application_mms/views/view_member_add.dart';
 import 'package:intl/intl.dart';
 
 class UserListView extends StatefulWidget {
@@ -63,7 +62,19 @@ class _UserListViewState extends State<UserListView> {
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [Text('date : $createDate')],
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          showUpdateUserDialog(
+                            context: context,
+                            member: member,
+                          );
+                        },
+                        icon: Icon(Icons.edit),
+                      ),
+                      IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+                      /*Text('date : $createDate')*/
+                    ],
                   ),
                 ),
               );

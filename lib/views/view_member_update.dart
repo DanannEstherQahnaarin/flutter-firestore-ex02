@@ -78,8 +78,8 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                   member: Member(
                     id: widget.updateMember.id,
                     uid: widget.updateMember.uid,
-                    name: widget.updateMember.name,
-                    email: widget.updateMember.email,
+                    name: txtNameController.text,
+                    email: txtEmailController.text,
                     userRole: selectedRole,
                     timestamp: DateTime.now(),
                   ),
