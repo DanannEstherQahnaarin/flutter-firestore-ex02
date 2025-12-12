@@ -12,18 +12,21 @@ class UpdateUserDialog extends StatefulWidget {
 }
 
 class _UpdateUserDialog extends State<UpdateUserDialog> {
+  late final TextEditingController txtNameController;
+  late final TextEditingController txtEmailController;
+
+  @override
+  void initState() {
+    super.initState();
+    txtNameController = TextEditingController(text: widget.updateMember.name);
+    txtEmailController = TextEditingController(text: widget.updateMember.email);
+    selectedRole = widget.updateMember.userRole;
+  }
+
+  UserRole selectedRole = UserRole.user;
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController txtNameController = TextEditingController(
-      text: widget.updateMember.name,
-    );
-
-    final TextEditingController txtEmailController = TextEditingController(
-      text: widget.updateMember.email,
-    );
-
-    UserRole selectedRole = UserRole.user;
-
     return AlertDialog(
       title: Text('Member Update'),
       content: SingleChildScrollView(
@@ -67,6 +70,7 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                   setState(() {
                     selectedRole = value;
                   });
+                  print(selectedRole);
                 }
               },
             ),
@@ -74,6 +78,7 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
 
             ElevatedButton(
               onPressed: () {
+                print(selectedRole);
                 _updateMember(
                   member: Member(
                     id: widget.updateMember.id,
@@ -81,7 +86,7 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                     name: txtNameController.text,
                     email: txtEmailController.text,
                     userRole: selectedRole,
-                    timestamp: DateTime.now(),
+                    timestamp: widget.updateMember.timestamp,
                   ),
                   context: context,
                 );
