@@ -1,5 +1,20 @@
 enum UserRole { user, admin }
 
+/// UserRole enum에 대한 확장 메서드
+extension UserRoleExtension on UserRole {
+  /// UserRole enum 값을 한글 표시명으로 변환
+  /// - UserRole.user -> '사용자'
+  /// - UserRole.admin -> '관리자'
+  String get displayName {
+    switch (this) {
+      case UserRole.user:
+        return '사용자';
+      case UserRole.admin:
+        return '관리자';
+    }
+  }
+}
+
 class Member {
   final String? id;
   final String? uid;

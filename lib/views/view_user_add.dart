@@ -70,9 +70,9 @@ class _AddUserDialogState extends State<AddUserDialog> {
                       // 드롭다운 메뉴와 선택 창에 표시될 한글 텍스트
                       label: option.displayName,
                       // 역할에 따라 다른 아이콘 표시
-                      // admin: verified_user 아이콘, user: person 아이콘
+                      // admin: person_2 아이콘, user: person 아이콘
                       leadingIcon: option == UserRole.admin
-                          ? Icon(Icons.verified_user)
+                          ? Icon(Icons.person_2)
                           : Icon(Icons.person),
                     );
                   })
@@ -166,7 +166,7 @@ void _addMember({
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
-        result == Answer.success.name
+        result == 'success'
             ? 'Member added successfully'
             : 'Failed to add member',
       ),
@@ -175,7 +175,7 @@ void _addMember({
 
   // 멤버 추가가 성공한 경우 다이얼로그 자동 닫기
   // Navigator.pop()을 통해 현재 다이얼로그를 닫고 이전 화면으로 복귀
-  if (result == Answer.success.name) {
+  if (result == 'success') {
     Navigator.of(context).pop();
   }
 }
