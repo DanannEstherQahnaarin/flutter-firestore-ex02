@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
 
 final FirebaseFirestore _db = FirebaseFirestore.instance;
 final String _collection = 'mms';
 
-enum answer { success, fail }
+enum Answer { success, fail }
 
 Stream<List<Member>> getMemberStream() {
   return _db
@@ -19,19 +18,23 @@ Stream<List<Member>> getMemberStream() {
       );
 }
 
-Future<String> addMemberToFirebase({required String name, required String email}) async {
+Future<String> addMemberToFirebase({
+  required String name,
+  required String email,
+  required UserRole userRole,
+}) async {
   final addMember = Member(
     name: name,
     email: email,
-    userRole: UserRole.user,
+    userRole: userRole,
     timestamp: DateTime.now(),
   );
 
   try {
     await _db.collection(_collection).add(addMember.toFirestore());
 
-    return answer.success.name;
+    return Answer.success.name;
   } catch (e) {
-    return answer.fail.name;
+    return Answer.fail.name;
   }
 }

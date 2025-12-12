@@ -24,8 +24,8 @@ class Member {
 
     return Member(
       id: id,
-      uid: (map['name'] ?? '') as String,
-      name: (map['uid'] ?? '') as String,
+      uid: (map['uid'] ?? '') as String,
+      name: (map['name'] ?? '') as String,
       email: (map['email'] ?? '') as String,
       timestamp: timestamp,
       userRole: UserRole.values.firstWhere(
@@ -36,6 +36,11 @@ class Member {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {'name': name, 'email': email, 'timestamp': timestamp};
+    return {
+      'name': name,
+      'email': email,
+      'userRole': userRole.name,
+      'timestamp': timestamp,
+    };
   }
 }

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
 import 'package:flutter_application_mms/service/service_member.dart';
+import 'package:flutter_application_mms/views/view_dialogs.dart';
+import 'package:flutter_application_mms/views/view_user_add.dart';
 
-class MainListView extends StatefulWidget {
-  const MainListView({super.key});
+class UserListView extends StatefulWidget {
+  const UserListView({super.key});
 
   @override
-  State<MainListView> createState() => _MainListViewState();
+  State<UserListView> createState() => _UserListViewState();
 }
 
-class _MainListViewState extends State<MainListView> {
+class _UserListViewState extends State<UserListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,9 @@ class _MainListViewState extends State<MainListView> {
                 child: ListTile(
                   leading: Icon(Icons.person, color: Colors.blue),
                   title: Text(member.name),
-                  subtitle: Text(member.email),
+                  subtitle: Text(
+                    'Role : ${member.userRole.displayName}, Email : ${member.email} ',
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [Text('create date : ${member.timestamp}')],
@@ -56,7 +60,9 @@ class _MainListViewState extends State<MainListView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showAddUserDialog(context: context);
+        },
         child: Icon(Icons.add_box),
       ),
     );
