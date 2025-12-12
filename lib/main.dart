@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/firebase_options.dart';
 import 'package:flutter_application_mms/views/view_login.dart';
-import 'package:flutter_application_mms/views/view_user_list.dart';
+import 'package:flutter_application_mms/views/view_member_list.dart';
 
 void main() async {
   // Flutter 엔진과 위젯 바인딩이 초기화될 때까지 기다립니다.

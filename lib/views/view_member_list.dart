@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
 import 'package:flutter_application_mms/service/service_member.dart';
 import 'package:flutter_application_mms/views/view_dialogs.dart';
-import 'package:flutter_application_mms/views/view_user_add.dart';
+import 'package:flutter_application_mms/views/view_member_add.dart';
+import 'package:intl/intl.dart';
 
 class UserListView extends StatefulWidget {
   const UserListView({super.key});
@@ -15,7 +16,7 @@ class _UserListViewState extends State<UserListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Member Manager System')),
+      appBar: AppBar(title: Text('Member List')),
       body: StreamBuilder<List<Member>>(
         stream: getMemberStream(),
         builder: (context, snapshot) {
@@ -37,6 +38,9 @@ class _UserListViewState extends State<UserListView> {
             itemCount: data.length,
             itemBuilder: (context, index) {
               final member = data[index];
+              final String createDate = DateFormat(
+                'yyyy-MM-ss',
+              ).format(member.timestamp);
 
               return Card(
                 elevation: 10,
@@ -44,14 +48,22 @@ class _UserListViewState extends State<UserListView> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ListTile(
-                  leading: Icon(Icons.person, color: Colors.blue),
+                  leading: Icon(
+                    member.userRole == UserRole.admin
+                        ? Icons.verified_user
+                        : Icons.person,
+                    color: member.userRole == UserRole.admin
+                        ? Colors.green
+                        : Colors.blueAccent,
+                    size: 25,
+                  ),
                   title: Text(member.name),
                   subtitle: Text(
                     'Role : ${member.userRole.displayName}, Email : ${member.email} ',
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [Text('create date : ${member.timestamp}')],
+                    children: [Text('date : $createDate')],
                   ),
                 ),
               );
