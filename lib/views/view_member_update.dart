@@ -70,7 +70,6 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                   setState(() {
                     selectedRole = value;
                   });
-                  print(selectedRole);
                 }
               },
             ),
@@ -78,7 +77,6 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
 
             ElevatedButton(
               onPressed: () {
-                print(selectedRole);
                 _updateMember(
                   member: Member(
                     id: widget.updateMember.id,

@@ -72,7 +72,15 @@ class _UserListViewState extends State<UserListView> {
                         },
                         icon: Icon(Icons.edit),
                       ),
-                      IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+                      IconButton(
+                        onPressed: () {
+                          showDeleteUserDialog(
+                            context: context,
+                            member: member,
+                          );
+                        },
+                        icon: Icon(Icons.delete),
+                      ),
                       /*Text('date : $createDate')*/
                     ],
                   ),
