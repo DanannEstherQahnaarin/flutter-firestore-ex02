@@ -12,12 +12,18 @@ class UpdateUserDialog extends StatefulWidget {
 }
 
 class _UpdateUserDialog extends State<UpdateUserDialog> {
-  final TextEditingController _txtNameController = TextEditingController();
-  final TextEditingController _txtEmailController = TextEditingController();
-  UserRole _selectedRole = UserRole.user;
-
   @override
   Widget build(BuildContext context) {
+    final TextEditingController txtNameController = TextEditingController(
+      text: widget.updateMember.name,
+    );
+
+    final TextEditingController txtEmailController = TextEditingController(
+      text: widget.updateMember.email,
+    );
+
+    UserRole selectedRole = UserRole.user;
+
     return AlertDialog(
       title: Text('Member Update'),
       content: SingleChildScrollView(
@@ -25,13 +31,13 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
         child: ListBody(
           children: [
             TextField(
-              controller: _txtNameController,
+              controller: txtNameController,
               keyboardType: TextInputType.name,
               decoration: InputDecoration(hintText: 'Name'),
             ),
             SizedBox(height: 15),
             TextField(
-              controller: _txtEmailController,
+              controller: txtEmailController,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(hintText: 'Email'),
             ),
@@ -59,7 +65,7 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                 if (value != null) {
                   // 선택된 역할을 State에 저장하고 UI 업데이트
                   setState(() {
-                    _selectedRole = value;
+                    selectedRole = value;
                   });
                 }
               },
@@ -74,7 +80,7 @@ class _UpdateUserDialog extends State<UpdateUserDialog> {
                     uid: widget.updateMember.uid,
                     name: widget.updateMember.name,
                     email: widget.updateMember.email,
-                    userRole: _selectedRole,
+                    userRole: selectedRole,
                     timestamp: DateTime.now(),
                   ),
                   context: context,
