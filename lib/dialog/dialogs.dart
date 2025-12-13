@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/models/member.dart';
+import 'package:flutter_application_mms/service/service_auth.dart';
+import 'package:flutter_application_mms/service/service_member.dart';
 import 'package:flutter_application_mms/views/view_member_add.dart';
 import 'package:flutter_application_mms/views/view_member_update.dart';
 
@@ -36,9 +38,35 @@ Future<void> showDeleteUserDialog({required Member member, required BuildContext
         ),
         TextButton(
           onPressed: () {
+            deleteMemberToFirebase(member: member);
             Navigator.pop(context, true);
           },
+          child: Text('Delete'),
+        ),
+      ],
+    ),
+  );
+}
+
+Future<void> showSignoutDialog({required BuildContext context}) async {
+  await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Log out'),
+      content: Text('로그아웃 하시겠습니까?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
           child: Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            AuthService().signOut();
+            Navigator.pop(context, true);
+          },
+          child: Text('Logout'),
         ),
       ],
     ),
