@@ -71,6 +71,7 @@ Stream<List<Member>> getMemberStream() {
 /// - try-catch로 감싸서 오류 발생 시 'fail' 반환
 Future<String> addMemberToFirebase({
   required String name,
+  required String uid,
   required String email,
   required UserRole userRole,
 }) async {
@@ -78,6 +79,7 @@ Future<String> addMemberToFirebase({
   // timestamp는 현재 시간으로 자동 설정
   final addMember = Member(
     name: name,
+    uid:uid,
     email: email,
     userRole: userRole,
     timestamp: DateTime.now(),

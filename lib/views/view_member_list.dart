@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_mms/appbar/appbars.dart';
 import 'package:flutter_application_mms/models/member.dart';
-import 'package:flutter_application_mms/service/service_auth.dart';
 import 'package:flutter_application_mms/service/service_member.dart';
 import 'package:flutter_application_mms/dialog/dialogs.dart';
 import 'package:intl/intl.dart';
@@ -16,19 +16,7 @@ class _UserListViewState extends State<UserListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Member List'),
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () => showSignoutDialog(context: context),
-                icon: Icon(Icons.logout),
-              ),
-            ],
-          ),
-        ],
-      ),
+      appBar: MyAppBar(title: "User List"),
       body: StreamBuilder<List<Member>>(
         stream: getMemberStream(),
         builder: (context, snapshot) {

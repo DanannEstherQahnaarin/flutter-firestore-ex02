@@ -46,10 +46,11 @@ class AuthService {
   /// 예외:
   /// - `FirebaseAuthException`: 이메일 형식 오류, 비밀번호 너무 짧음,
   ///   이미 존재하는 이메일 등 인증 관련 오류 발생 시
-  Future<Member?> signUpWithEmail({
+  Future<User?> signUpWithEmail({
     required String name,
     required String email,
     required String password,
+    UserRole userRole = UserRole.user,
   }) async {
     try {
       // Firebase Authentication에 새 사용자 계정 생성
@@ -71,7 +72,7 @@ class AuthService {
           uid: user.uid, // Firebase Auth에서 생성된 고유 사용자 ID
           name: name, // 사용자가 입력한 이름
           email: email, // 사용자가 입력한 이메일
-          userRole: UserRole.user, // 기본 역할을 'user'로 설정
+          userRole: userRole, // 기본 역할을 'user'로 설정
           timestamp: DateTime.now(), // 회원가입 시점의 타임스탬프
         );
 
@@ -79,8 +80,7 @@ class AuthService {
         // add() 메서드는 자동으로 문서 ID를 생성합니다.
         await _db.collection(_collection).add(newMember.toFirestore());
 
-        // 생성된 Member 객체 반환
-        return newMember;
+        return user;
       }
 
       // 사용자 생성 실패 시 null 반환
@@ -133,65 +133,43 @@ class AuthService {
     await firebaseAuth.signOut();
   }
 
-  /// 로그인 또는 회원가입을 수행하는 통합 인증 메서드
-  ///
-  /// [isLogin]의 값에 따라 로그인 또는 회원가입을 자동으로 선택합니다.
-  /// 하나의 메서드로 두 가지 인증 작업을 처리할 수 있어 UI 코드를 단순화할 수 있습니다.
-  ///
-  /// **로그인 모드** (isLogin = true):
-  /// - [email]과 [password]만 사용하여 기존 사용자 로그인
-  /// - [name] 파라미터는 무시됨
-  /// - signInWithEmail() 메서드를 내부적으로 호출
-  /// - 반환값: null (로그인은 User 객체 반환, Member는 반환하지 않음)
-  ///
-  /// **회원가입 모드** (isLogin = false):
-  /// - [email], [password], [name]을 사용하여 새 사용자 등록
-  /// - [name]이 null이거나 비어있으면 ArgumentError 발생
-  /// - signUpWithEmail() 메서드를 내부적으로 호출
-  /// - 반환값: 생성된 Member 객체 (성공 시) 또는 null (실패 시)
-  ///
-  /// [isLogin] 로그인 모드인지 여부 (true: 로그인, false: 회원가입)
-  /// [email] 사용자 이메일 주소 (필수, 로그인/회원가입 공통)
-  /// [password] 사용자 비밀번호 (필수, 로그인/회원가입 공통)
-  /// [name] 사용자 이름 (회원가입 시에만 필수, 로그인 시에는 무시됨)
+  /// 현재 로그인된 사용자의 회원 정보를 Firestore에서 조회합니다.
   ///
   /// 반환값:
-  /// - 로그인 모드: null (로그인은 User 객체 반환, Member는 반환하지 않음)
-  /// - 회원가입 모드: 생성된 Member 객체 (성공 시) 또는 null (실패 시)
-  Future<Member?> authenticate({
-    required bool isLogin,
-    required String email,
-    required String password,
-    String? name,
-  }) async {
-    // 로그인 모드 처리
-    // isLogin이 true이면 기존 사용자 로그인을 수행합니다.
-    if (isLogin) {
-      // 로그인 수행
-      // signInWithEmail은 User 객체를 반환하지만,
-      // 이 메서드는 Member 객체를 반환하므로 null을 반환합니다.
-      // 실제 User 객체는 member 스트림을 통해 확인 가능합니다.
-      await signInWithEmail(email: email, password: password);
-      // 로그인 성공 여부와 관계없이 null 반환
-      // (로그인은 User 반환, Member는 반환하지 않음)
+  /// - 성공 시: 로그인된 사용자의 Member 객체
+  /// - 실패 시: null (로그인되어 있지 않거나, Firestore에 데이터가 없을 경우)
+  ///
+  /// 동작 과정:
+  /// 1. 현재 로그인된 Firebase Auth의 User 객체를 조회합니다.
+  /// 2. 사용자가 없으면(null) 즉시 null을 반환합니다.
+  /// 3. Firestore에서 해당 사용자의 uid로 문서를 조회합니다.
+  /// 4. 데이터가 존재하면 해당 데이터를 Member 객체로 변환해 반환합니다.
+  /// 5. 조회 실패/예외 또는 데이터 미존재 시 null 반환
+  Future<Member?> getCurrentMember() async {
+    // 현재 로그인 중인 Firebase 사용자 가져오기
+    final user = firebaseAuth.currentUser;
+
+    // 만약 로그인된 사용자가 없으면 null 반환
+    if (user == null) {
       return null;
     }
 
-    // 회원가입 모드 처리
-    // isLogin이 false이면 새 사용자 회원가입을 수행합니다.
-    // name이 null이거나 비어있으면 명시적으로 예외 발생
-    if (name == null || name.trim().isEmpty) {
-      throw ArgumentError('회원가입 모드에서는 name이 필수이며 비어있을 수 없습니다.', 'name');
-    }
+    try {
+      // Firestore에서 컬렉션(_collection) 내 uid와 일치하는 문서 조회
+      final doc = await _db.collection(_collection).doc(user.uid).get();
 
-    // 회원가입 수행 및 결과 반환
-    // signUpWithEmail은 Member 객체를 반환합니다.
-    // 성공 시 Member 객체, 실패 시 null을 반환합니다.
-    final member = await signUpWithEmail(
-      name: name,
-      email: email,
-      password: password,
-    );
-    return member;
+      // 문서가 존재하며 데이터가 비어있지 않은 경우
+      if (doc.exists && doc.data() != null) {
+        // 가져온 데이터를 Member 객체로 변환하여 반환
+        return Member.fromFirestore(doc.data()!, doc.id);
+      }
+
+      // 문서가 없거나 데이터가 없으면 null 반환
+      return null;
+    } on Exception catch (e) {
+      // 예외 발생 시 오류 메시지 출력 후 null 반환
+      print('getCurrentMember 예외: $e');
+      return null;
+    }
   }
 }

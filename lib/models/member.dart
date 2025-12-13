@@ -25,7 +25,7 @@ class Member {
 
   Member({
     this.id,
-    this.uid,
+    required this.uid,
     required this.name,
     required this.email,
     required this.userRole,
@@ -54,6 +54,7 @@ class Member {
     return {
       'name': name,
       'email': email,
+      'uid' : uid,
       'userRole': userRole.name,
       'timestamp': timestamp,
     };
