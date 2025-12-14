@@ -179,7 +179,7 @@ void _addMember({
   required String password,
   required BuildContext context,
 }) async {
-  final AuthService authService = AuthService();
+  
 
   // 이름 입력값 유효성 검사
   // 이름이 비어있으면 에러 메시지 표시 후 함수 종료
@@ -199,7 +199,7 @@ void _addMember({
     return;
   }
 
-  final User? user = await authService.signUpWithEmail(
+  final User? user = await AuthService().signUpWithEmail(
     name: name,
     email: email,
     password: password,

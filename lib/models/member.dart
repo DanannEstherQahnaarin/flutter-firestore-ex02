@@ -17,7 +17,7 @@ extension UserRoleExtension on UserRole {
 
 class Member {
   final String? id;
-  final String? uid;
+  final String uid;
   final String name;
   final String email;
   final UserRole userRole;

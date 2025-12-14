@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_mms/common_widget/textformfields.dart';
 import 'package:flutter_application_mms/service/service_auth.dart';
+import 'package:flutter_application_mms/service/service_validation.dart';
 
 class UserLogin extends StatefulWidget {
   const UserLogin({super.key});
@@ -10,7 +12,7 @@ class UserLogin extends StatefulWidget {
 
 class _UserLoginState extends State<UserLogin> {
   final _formKey = GlobalKey<FormState>();
-  final AuthService authService = AuthService();
+  final AuthService _authService = AuthService();
   final TextEditingController _txtNameController = TextEditingController();
   final TextEditingController _txtEmailController = TextEditingController();
   final TextEditingController _txtPasswordController = TextEditingController();
@@ -30,53 +32,33 @@ class _UserLoginState extends State<UserLogin> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (!_isLoginView)
-                  TextFormField(
+                  CustomInputFormField(
                     controller: _txtNameController,
-                    decoration: InputDecoration(labelText: 'Name'),
+                    labelText: 'Name',
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return '이름을 입력하여 주십시오.';
-                      }
-
-                      return null;
+                      return ValidationService.validateRequired(
+                        value: value ?? '',
+                        fieldName: '사용자 이름',
+                      );
                     },
                   ),
                 SizedBox(height: 20),
-                TextFormField(
+                CustomInputFormField(
                   controller: _txtEmailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(labelText: 'Email'),
+                  labelText: 'Email',
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '이메일을 입력하여 주십시오.';
-                    } else {
-                      final emailRegExp = RegExp(
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                      );
-
-                      if (!emailRegExp.hasMatch(value)) {
-                        return '유효하지 않은 이메일 형식입니다.';
-                      }
-
-                      return null;
-                    }
+                    return ValidationService.validateEmail(value: value ?? '');
                   },
                 ),
                 SizedBox(height: 20),
-                TextFormField(
+                CustomInputFormField(
                   controller: _txtPasswordController,
-                  decoration: InputDecoration(labelText: 'Password'),
+                  labelText: 'Password',
                   obscureText: true,
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '패스워드를 입력하여 주십시오.';
-                    }
-
-                    if (!_isLoginView && value.length < 6) {
-                      return '패스워드를 6자 이상 입력하여 주십시오.';
-                    }
-
-                    return null;
+                    return ValidationService.validatePassword(
+                      value: value ?? '',
+                    );
                   },
                 ),
                 SizedBox(height: 20),
@@ -88,7 +70,7 @@ class _UserLoginState extends State<UserLogin> {
                       String password = _txtPasswordController.text;
 
                       if (_isLoginView) {
-                        authService
+                        _authService
                             .signInWithEmail(email: email, password: password)
                             .then((result) {
                               if (result == null) {
@@ -103,7 +85,7 @@ class _UserLoginState extends State<UserLogin> {
                       }
 
                       if (!_isLoginView) {
-                        authService
+                        _authService
                             .signUpWithEmail(
                               name: name,
                               email: email,

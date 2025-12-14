@@ -1,19 +1,19 @@
 class Board {
-  final String id;
-  final int boardNum;
+  final String? id;
   final String title;
   final String content;
-  final String writer;
+  final String writerUid;
+  final String writerNm;
   final int readCount;
   final bool isNotice;
   final DateTime timestamp;
 
   Board({
-    required this.id,
-    required this.boardNum,
+    this.id,
     required this.title,
     required this.content,
-    required this.writer,
+    required this.writerUid,
+    required this.writerNm,
     this.readCount = 0,
     this.isNotice = false,
     required this.timestamp,
@@ -26,10 +26,10 @@ class Board {
 
     return Board(
       id: id,
-      boardNum: (map['boardNum'] ?? 0) as int,
       title: (map['title'] ?? '') as String,
       content: (map['content'] ?? '') as String,
-      writer: (map['writer'] ?? '') as String,
+      writerUid: (map['writerUid'] ?? '') as String,
+      writerNm: (map['writerNm'] ?? '') as String,
       readCount: (map['readCount'] ?? 0) as int,
       isNotice: (map['isNotice'] ?? false) as bool,
       timestamp: timestamp,
@@ -39,9 +39,9 @@ class Board {
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
-      'boardNum':boardNum,
       'content': content,
-      'writer': writer,
+      'writerUid': writerUid,
+      'writerNm': writerNm,
       'readCount': readCount,
       'isNotice': isNotice,
       'timestamp': timestamp,

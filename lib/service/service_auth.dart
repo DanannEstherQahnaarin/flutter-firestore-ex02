@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_mms/models/board.dart';
 import 'package:flutter_application_mms/models/member.dart';
 
 /// Firebase Authentication을 관리하는 서비스 클래스
@@ -22,7 +23,9 @@ class AuthService {
 
   /// Firestore 컬렉션 이름
   /// 회원 정보가 저장되는 컬렉션의 이름입니다.
-  final String _collection = 'mms';
+  final String _memberCollection = 'member_collection';
+
+  final String _boardCollection = 'board_collection';
 
   /// 현재 인증 상태를 실시간으로 관찰할 수 있는 스트림
   ///
@@ -77,8 +80,10 @@ class AuthService {
         );
 
         // Firestore에 회원 정보 저장
-        // add() 메서드는 자동으로 문서 ID를 생성합니다.
-        await _db.collection(_collection).add(newMember.toFirestore());
+        await _db
+            .collection(_memberCollection)
+            .doc(user.uid)
+            .set(newMember.toFirestore());
 
         return user;
       }
@@ -89,7 +94,6 @@ class AuthService {
       // Firebase 인증 관련 오류 처리
       // 예: 이메일 형식 오류, 약한 비밀번호, 이미 존재하는 이메일 등
       print(e.message);
-      // TODO: 적절한 오류 처리를 위해 null 반환 또는 예외 재발생 고려
       return null;
     }
   }
@@ -155,21 +159,35 @@ class AuthService {
     }
 
     try {
-      // Firestore에서 컬렉션(_collection) 내 uid와 일치하는 문서 조회
-      final doc = await _db.collection(_collection).doc(user.uid).get();
+      // Firestore에서 _member_collection 컬렉션 내 uid와 일치하는 문서 조회
+      final QuerySnapshot query = await _db
+          .collection(_memberCollection)
+          .where('uid', isEqualTo: user.uid)
+          .limit(1)
+          .get();
 
-      // 문서가 존재하며 데이터가 비어있지 않은 경우
-      if (doc.exists && doc.data() != null) {
-        // 가져온 데이터를 Member 객체로 변환하여 반환
-        return Member.fromFirestore(doc.data()!, doc.id);
+      // 쿼리 결과가 없을 수 있으니 체크
+      if (query.docs.isEmpty) {
+        print('getCurrentMember: 유저 uid(${user.uid})로 찾은 멤버 문서 없음');
+        return null;
       }
 
-      // 문서가 없거나 데이터가 없으면 null 반환
-      return null;
-    } on Exception catch (e) {
+      final doc = query.docs.first;
+      final data = doc.data() as Map<String, dynamic>;
+
+      return Member.fromFirestore(data, doc.id);
+    } catch (e) {
       // 예외 발생 시 오류 메시지 출력 후 null 반환
       print('getCurrentMember 예외: $e');
       return null;
+    }
+  }
+
+  Future<void> addBoard(Board board) async {
+    try {
+      await _db.collection(_boardCollection).add(board.toFirestore());
+    } on Exception catch (e) {
+      print(e);
     }
   }
 }
