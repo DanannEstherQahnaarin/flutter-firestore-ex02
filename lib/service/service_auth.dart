@@ -137,50 +137,43 @@ class AuthService {
     await firebaseAuth.signOut();
   }
 
-  /// 현재 로그인된 사용자의 회원 정보를 Firestore에서 조회합니다.
-  ///
-  /// 반환값:
-  /// - 성공 시: 로그인된 사용자의 Member 객체
-  /// - 실패 시: null (로그인되어 있지 않거나, Firestore에 데이터가 없을 경우)
-  ///
-  /// 동작 과정:
-  /// 1. 현재 로그인된 Firebase Auth의 User 객체를 조회합니다.
-  /// 2. 사용자가 없으면(null) 즉시 null을 반환합니다.
-  /// 3. Firestore에서 해당 사용자의 uid로 문서를 조회합니다.
-  /// 4. 데이터가 존재하면 해당 데이터를 Member 객체로 변환해 반환합니다.
-  /// 5. 조회 실패/예외 또는 데이터 미존재 시 null 반환
-  Future<Member?> getCurrentMember() async {
-    // 현재 로그인 중인 Firebase 사용자 가져오기
-    final user = firebaseAuth.currentUser;
+  Future<Member?> getUserModelByUid(User user) async {
+    try {
+      final doc = await _db.collection(_memberCollection).doc(user.uid).get();
 
-    // 만약 로그인된 사용자가 없으면 null 반환
-    if (user == null) {
+      if (doc.exists && doc.data() != null) {
+        return Member.fromFirestore(doc.data()!, doc.id);
+      }
+      return null;
+    } catch (e) {
+      print("사용자 모델 로딩 오류: $e");
       return null;
     }
+  }
 
-    try {
-      // Firestore에서 _member_collection 컬렉션 내 uid와 일치하는 문서 조회
-      final QuerySnapshot query = await _db
-          .collection(_memberCollection)
-          .where('uid', isEqualTo: user.uid)
-          .limit(1)
-          .get();
-
-      // 쿼리 결과가 없을 수 있으니 체크
-      if (query.docs.isEmpty) {
-        print('getCurrentMember: 유저 uid(${user.uid})로 찾은 멤버 문서 없음');
+  Stream<Member?> get getMemberStream {
+    return firebaseAuth.authStateChanges().asyncMap((user) async {
+      // 1. 로그아웃 상태: user가 null이면 즉시 null 반환 (UserModel 없음)
+      if (user == null) {
         return null;
       }
 
-      final doc = query.docs.first;
-      final data = doc.data() as Map<String, dynamic>;
+      // 2. 로그인 상태: Firestore에서 해당 UID의 UserModel을 조회
+      //    (userModelByUid 함수를 재활용하거나 인라인으로 구현)
+      try {
+        final doc = await _db.collection(_memberCollection).doc(user.uid).get();
 
-      return Member.fromFirestore(data, doc.id);
-    } catch (e) {
-      // 예외 발생 시 오류 메시지 출력 후 null 반환
-      print('getCurrentMember 예외: $e');
-      return null;
-    }
+        if (doc.exists && doc.data() != null) {
+          // UserModel 객체를 반환
+          return Member.fromFirestore(doc.data()!, doc.id);
+        }
+        // 문서가 존재하지 않는 경우 (비정상 상태)
+        return null;
+      } catch (e) {
+        print("userModelStream 오류: $e");
+        return null;
+      }
+    });
   }
 
   Future<void> addBoard(Board board) async {
