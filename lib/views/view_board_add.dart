@@ -15,35 +15,35 @@ class _AddBordPageState extends State<AddBordPage> {
   final TextEditingController _txtContentController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(title: "글쓰기"),
-      body: Padding(
-        padding: EdgeInsets.all(10),
-        child: Form(
-          child: Column(
-            children: [
-              CustomInputFormField(
-                controller: _txtTitleController,
-                labelText: 'Title',
-                validator: (value) => ValidationService.validateRequired(
-                  value: value ?? '',
-                  fieldName: '제목',
-                ),
+  Widget build(BuildContext context) => Scaffold(
+    appBar: MyAppBar(title: '글쓰기'),
+    body: Padding(
+      padding: const EdgeInsets.all(10),
+      child: Form(
+        child: Column(
+          children: [
+            CustomInputFormField(
+              controller: _txtTitleController,
+              labelText: 'Title',
+              validator: (value) =>
+                  ValidationService.validateRequired(value: value ?? '', fieldName: '제목'),
+            ),
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  CustomInputFormField(
+                    controller: _txtContentController,
+                    labelText: 'Content',
+                    expands: true,
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                  ),
+                ],
               ),
-              SingleChildScrollView(
-                child: CustomInputFormField(
-                  controller: _txtContentController,
-                  labelText: 'Content',
-                  expands: true,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 }

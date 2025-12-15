@@ -14,15 +14,18 @@ class BoardPage extends StatelessWidget {
       body: Column(
         children: [
           const Divider(),
-          Expanded(child: Column(
-            children: [],
-          ))
+          Expanded(child: Column(children: [])),
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed:() {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddBordPage(),));
-      },
-      child: Icon(Icons.edit),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddBordPage()),
+          );
+        },
+        child: const Icon(Icons.edit),
+      ),
     );
   }
 }
