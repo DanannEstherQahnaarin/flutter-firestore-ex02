@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_application_mms/models/board.dart';
 import 'package:flutter_application_mms/models/member.dart';
 
@@ -49,19 +50,11 @@ class AuthService {
   /// 예외:
   /// - `FirebaseAuthException`: 이메일 형식 오류, 비밀번호 너무 짧음,
   ///   이미 존재하는 이메일 등 인증 관련 오류 발생 시
-  Future<User?> signUpWithEmail({
-    required String name,
-    required String email,
-    required String password,
-    UserRole userRole = UserRole.user,
-  }) async {
+  Future<User?> signUpWithEmail({required String name, required String email, required String password, UserRole userRole = UserRole.user}) async {
     try {
       // Firebase Authentication에 새 사용자 계정 생성
       // 이메일과 비밀번호를 사용하여 인증 정보를 생성합니다.
-      UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
 
       // 생성된 사용자 정보 가져오기
       // result.user는 새로 생성된 사용자 객체를 포함합니다.
@@ -80,10 +73,7 @@ class AuthService {
         );
 
         // Firestore에 회원 정보 저장
-        await _db
-            .collection(_memberCollection)
-            .doc(user.uid)
-            .set(newMember.toFirestore());
+        await _db.collection(_memberCollection).doc(user.uid).set(newMember.toFirestore());
 
         return user;
       }
@@ -93,7 +83,7 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       // Firebase 인증 관련 오류 처리
       // 예: 이메일 형식 오류, 약한 비밀번호, 이미 존재하는 이메일 등
-      print(e.message);
+      debugPrint(e.message);
       return null;
     }
   }
@@ -109,24 +99,16 @@ class AuthService {
   ///
   /// 예외:
   /// - 잘못된 이메일/비밀번호, 사용자 계정이 비활성화됨 등의 오류 발생 가능
-  Future<User?> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
+  Future<User?> signInWithEmail({required String email, required String password}) async {
     try {
       // Firebase Authentication을 사용하여 로그인 시도
       // 제공된 이메일과 비밀번호로 사용자 인증을 수행합니다.
-      UserCredential result = await firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential result = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
 
       // 로그인 성공 시 User 객체 반환
       return result.user;
     } catch (e) {
-      // 모든 예외를 잡아서 처리
-      // 로그인 실패 시 null을 반환합니다.
-      // TODO: 오류 유형에 따른 적절한 오류 메시지 반환 고려
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -146,7 +128,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print("사용자 모델 로딩 오류: $e");
+      debugPrint("사용자 모델 로딩 오류: $e");
       return null;
     }
   }
@@ -170,7 +152,7 @@ class AuthService {
         // 문서가 존재하지 않는 경우 (비정상 상태)
         return null;
       } catch (e) {
-        print("userModelStream 오류: $e");
+        debugPrint("userModelStream 오류: $e");
         return null;
       }
     });
@@ -180,7 +162,7 @@ class AuthService {
     try {
       await _db.collection(_boardCollection).add(board.toFirestore());
     } on Exception catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 }
