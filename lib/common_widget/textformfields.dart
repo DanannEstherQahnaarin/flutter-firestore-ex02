@@ -32,6 +32,7 @@ class CustomInputFormField extends StatelessWidget {
       obscureText: obscureText,
       maxLines: maxLines,
       expands: expands,
+      textAlignVertical:TextAlignVertical.top,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,

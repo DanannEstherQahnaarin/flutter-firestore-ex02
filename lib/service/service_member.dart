@@ -7,7 +7,7 @@ final FirebaseFirestore _db = FirebaseFirestore.instance;
 
 /// Firestore 컬렉션 이름
 /// 멤버 데이터를 저장하는 컬렉션의 이름 ('mms')
-final String _collection = 'mms';
+const String _collection = 'mms';
 
 /// 작업 결과를 나타내는 enum
 /// - success: 작업 성공
@@ -31,24 +31,22 @@ enum Answer { success, fail }
 ///   stream: getMemberStream(),
 ///   builder: (context, snapshot) { ... }
 /// )
-Stream<List<Member>> getMemberStream() {
-  return _db
-      // 'mms' 컬렉션 참조
-      .collection(_collection)
-      // timestamp 필드를 기준으로 정렬 (오름차순)
-      .orderBy('timestamp')
-      // 실시간 스냅샷 스트림 생성 (데이터 변경 시 자동 업데이트)
-      .snapshots()
-      // 스냅샷을 Member 객체 리스트로 변환
-      .map(
-        (snapshot) => snapshot.docs
-            // 각 문서를 Member 객체로 변환
-            // doc.data(): 문서의 데이터 (Map<String, dynamic>)
-            // doc.id: 문서의 고유 ID
-            .map((doc) => Member.fromFirestore(doc.data(), doc.id))
-            .toList(),
-      );
-}
+Stream<List<Member>> getMemberStream() => _db
+    // 'mms' 컬렉션 참조
+    .collection(_collection)
+    // timestamp 필드를 기준으로 정렬 (오름차순)
+    .orderBy('timestamp')
+    // 실시간 스냅샷 스트림 생성 (데이터 변경 시 자동 업데이트)
+    .snapshots()
+    // 스냅샷을 Member 객체 리스트로 변환
+    .map(
+      (snapshot) => snapshot.docs
+          // 각 문서를 Member 객체로 변환
+          // doc.data(): 문서의 데이터 (Map<String, dynamic>)
+          // doc.id: 문서의 고유 ID
+          .map((doc) => Member.fromFirestore(doc.data(), doc.id))
+          .toList(),
+    );
 
 /// 새로운 멤버를 Firestore에 추가하는 비동기 함수
 ///
@@ -79,7 +77,7 @@ Future<String> addMemberToFirebase({
   // timestamp는 현재 시간으로 자동 설정
   final addMember = Member(
     name: name,
-    uid:uid,
+    uid: uid,
     email: email,
     userRole: userRole,
     timestamp: DateTime.now(),
@@ -125,10 +123,7 @@ Future<String> updateMemberToFirebase({required Member member}) async {
     // 'mms' 컬렉션에서 member.id에 해당하는 문서를 찾아 업데이트
     // doc(member.id): 특정 문서 ID로 문서 참조
     // update(): 문서의 필드들을 업데이트 (기존 필드는 유지, 지정한 필드만 변경)
-    await _db
-        .collection(_collection)
-        .doc(member.id)
-        .update(member.toFirestore());
+    await _db.collection(_collection).doc(member.id).update(member.toFirestore());
 
     // 성공 시 'success' 문자열 반환
     return Answer.success.name;

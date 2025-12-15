@@ -50,15 +50,23 @@ class AuthService {
   /// 예외:
   /// - `FirebaseAuthException`: 이메일 형식 오류, 비밀번호 너무 짧음,
   ///   이미 존재하는 이메일 등 인증 관련 오류 발생 시
-  Future<User?> signUpWithEmail({required String name, required String email, required String password, UserRole userRole = UserRole.user}) async {
+  Future<User?> signUpWithEmail({
+    required String name,
+    required String email,
+    required String password,
+    UserRole userRole = UserRole.user,
+  }) async {
     try {
       // Firebase Authentication에 새 사용자 계정 생성
       // 이메일과 비밀번호를 사용하여 인증 정보를 생성합니다.
-      UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       // 생성된 사용자 정보 가져오기
       // result.user는 새로 생성된 사용자 객체를 포함합니다.
-      User? user = result.user;
+      final User? user = result.user;
 
       // 사용자가 성공적으로 생성되었는지 확인
       if (user != null) {
@@ -103,7 +111,10 @@ class AuthService {
     try {
       // Firebase Authentication을 사용하여 로그인 시도
       // 제공된 이메일과 비밀번호로 사용자 인증을 수행합니다.
-      UserCredential result = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      final UserCredential result = await firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       // 로그인 성공 시 User 객체 반환
       return result.user;
@@ -128,35 +139,34 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      debugPrint("사용자 모델 로딩 오류: $e");
+      debugPrint('사용자 모델 로딩 오류: $e');
       return null;
     }
   }
 
-  Stream<Member?> get getMemberStream {
-    return firebaseAuth.authStateChanges().asyncMap((user) async {
-      // 1. 로그아웃 상태: user가 null이면 즉시 null 반환 (UserModel 없음)
-      if (user == null) {
-        return null;
-      }
-
-      // 2. 로그인 상태: Firestore에서 해당 UID의 UserModel을 조회
-      //    (userModelByUid 함수를 재활용하거나 인라인으로 구현)
-      try {
-        final doc = await _db.collection(_memberCollection).doc(user.uid).get();
-
-        if (doc.exists && doc.data() != null) {
-          // UserModel 객체를 반환
-          return Member.fromFirestore(doc.data()!, doc.id);
+  Stream<Member?> get getMemberStream =>
+      firebaseAuth.authStateChanges().asyncMap((user) async {
+        // 1. 로그아웃 상태: user가 null이면 즉시 null 반환 (UserModel 없음)
+        if (user == null) {
+          return null;
         }
-        // 문서가 존재하지 않는 경우 (비정상 상태)
-        return null;
-      } catch (e) {
-        debugPrint("userModelStream 오류: $e");
-        return null;
-      }
-    });
-  }
+
+        // 2. 로그인 상태: Firestore에서 해당 UID의 UserModel을 조회
+        //    (userModelByUid 함수를 재활용하거나 인라인으로 구현)
+        try {
+          final doc = await _db.collection(_memberCollection).doc(user.uid).get();
+
+          if (doc.exists && doc.data() != null) {
+            // UserModel 객체를 반환
+            return Member.fromFirestore(doc.data()!, doc.id);
+          }
+          // 문서가 존재하지 않는 경우 (비정상 상태)
+          return null;
+        } catch (e) {
+          debugPrint('userModelStream 오류: $e');
+          return null;
+        }
+      });
 
   Future<void> addBoard(Board board) async {
     try {
@@ -165,4 +175,13 @@ class AuthService {
       debugPrint(e.toString());
     }
   }
+
+  Stream<List<Board>> getPostsStream() => _db
+      .collection(_boardCollection)
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => Board.fromFirestore(doc.data(), doc.id)).toList(),
+      );
 }
