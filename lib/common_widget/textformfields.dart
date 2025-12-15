@@ -25,23 +25,21 @@ class CustomInputFormField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        maxLines: maxLines,
-        expands: expands,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          border: const OutlineInputBorder(),
-        ),
-        // validator를 외부에서 주입받거나, 내부에서 기본 로직을 설정할 수 있습니다.
-        validator: validator,
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      maxLines: maxLines,
+      expands: expands,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: const OutlineInputBorder(),
       ),
-    );
-  }
+      // validator를 외부에서 주입받거나, 내부에서 기본 로직을 설정할 수 있습니다.
+      validator: validator,
+    ),
+  );
 }
