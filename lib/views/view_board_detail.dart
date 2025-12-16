@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/common_widget/appbars.dart';
 import 'package:flutter_application_mms/common_widget/textformfields.dart';
+import 'package:flutter_application_mms/dialog/dialogs.dart';
 import 'package:flutter_application_mms/models/board.dart';
 import 'package:flutter_application_mms/service/service_board.dart';
 import 'package:flutter_application_mms/service/service_validation.dart';
@@ -96,7 +97,7 @@ class _DetailBoardPageState extends State<DetailBoardPage> {
                           timestamp: DateTime.now(),
                         );
 
-                        BoardService().updateBoard(board: updateBoard);
+                        showUpdateBoardDialog(board: updateBoard, context: context);
                       },
                       child: const Text('저장'),
                     ),
@@ -109,7 +110,7 @@ class _DetailBoardPageState extends State<DetailBoardPage> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: () {
-                        BoardService().deleteBoard(board: widget.board);
+                        showDeleteBoardDialog(board: widget.board, context: context);
                       },
                       child: const Text('삭제'),
                     ),
