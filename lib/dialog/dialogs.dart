@@ -121,4 +121,40 @@ Future<void> showUpdateBoardDialog({
 Future<void> showDeleteBoardDialog({
   required Board board,
   required BuildContext context,
-}) async {}
+}) async {
+  await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete'),
+      content: const Text('삭제 하시겠습니까?'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            final bool result = await BoardService().deleteBoard(board: board);
+
+            if (!context.mounted) return;
+
+            if (result) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('삭제되었습니다.')));
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('수정에 실패하였습니다다.')));
+            }
+
+            Navigator.pop(context);
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    ),
+  );
+}

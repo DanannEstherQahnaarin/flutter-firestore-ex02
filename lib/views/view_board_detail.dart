@@ -98,6 +98,7 @@ class _DetailBoardPageState extends State<DetailBoardPage> {
                         );
 
                         showUpdateBoardDialog(board: updateBoard, context: context);
+                        Navigator.of(context).pushNamedAndRemoveUntil('/board_list', (route) => false);
                       },
                       child: const Text('저장'),
                     ),
