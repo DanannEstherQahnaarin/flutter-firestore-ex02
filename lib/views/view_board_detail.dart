@@ -3,7 +3,6 @@ import 'package:flutter_application_mms/common_widget/appbars.dart';
 import 'package:flutter_application_mms/common_widget/textformfields.dart';
 import 'package:flutter_application_mms/dialog/dialogs.dart';
 import 'package:flutter_application_mms/models/board.dart';
-import 'package:flutter_application_mms/service/service_board.dart';
 import 'package:flutter_application_mms/service/service_validation.dart';
 
 class DetailBoardPage extends StatefulWidget {
@@ -98,7 +97,9 @@ class _DetailBoardPageState extends State<DetailBoardPage> {
                         );
 
                         showUpdateBoardDialog(board: updateBoard, context: context);
-                        Navigator.of(context).pushNamedAndRemoveUntil('/board_list', (route) => false);
+                        Navigator.of(
+                          context,
+                        ).pushNamedAndRemoveUntil('/board_list', (route) => false);
                       },
                       child: const Text('저장'),
                     ),

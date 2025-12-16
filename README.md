@@ -33,7 +33,7 @@ lib/
 └── common_widgets/
     ├── appbars.dart     # 공통 AppBar 기능 설정
     └── textformfields.dart      # 공통 TextFormField 기능 설정정
-
+```
 
 ### Dart 파일별 주요 기능 요약
 - `main.dart`: 앱의 진입점, 전체 전역설정 및 화면 라우팅 관리
