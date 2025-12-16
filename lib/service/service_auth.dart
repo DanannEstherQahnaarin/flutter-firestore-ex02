@@ -130,6 +130,15 @@ class AuthService {
     await firebaseAuth.signOut();
   }
 
+  /// 주어진 Firebase User의 UID로 Firestore에서 Member 모델을 조회하여 반환합니다.
+  ///
+  /// 상세 기능:
+  /// - 해당 사용자의 UID로 members 컬렉션에서 도큐먼트를 조회합니다.
+  /// - 도큐먼트가 존재하고 데이터가 있을 경우 Member 모델로 변환하여 반환합니다.
+  /// - 도큐먼트가 없거나 예외가 발생하면 null을 반환합니다.
+  ///
+  /// [user] Firebae 인증 User 객체(필수)
+  /// 반환: 존재하는 경우 Member, 없거나 오류시 null
   Future<Member?> getUserModelByUid(User user) async {
     try {
       final doc = await _db.collection(_memberCollection).doc(user.uid).get();
@@ -144,6 +153,14 @@ class AuthService {
     }
   }
 
+  /// 현재 인증 상태에 따라 사용자 Member 스트림을 제공합니다.
+  ///
+  /// 상세 기능:
+  /// - 인증 상태(authStateChanges)가 변경될 때마다, User가 없으면(null) 즉시 null을 반환합니다.
+  /// - User가 있다면 getUserModelByUid처럼 해당 UID의 members 문서를 조회, 존재 시 Member로 반환합니다.
+  /// - 오류나 도큐먼트 없음 등 모든 실패 케이스에서 null 반환.
+  ///
+  /// 사용 예: 로그인, 로그아웃, 가입 등 인증 상태에 따른 자동 Member 정보 스트리밍 처리에 사용.
   Stream<Member?> get getMemberStream =>
       firebaseAuth.authStateChanges().asyncMap((user) async {
         // 1. 로그아웃 상태: user가 null이면 즉시 null 반환 (UserModel 없음)
@@ -168,14 +185,14 @@ class AuthService {
         }
       });
 
-  Future<void> addBoard(Board board) async {
-    try {
-      await _db.collection(_boardCollection).add(board.toFirestore());
-    } on Exception catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
+  /// 게시글(Board) 목록을 스트림으로 실시간 제공
+  ///
+  /// 상세 기능:
+  /// - boards 컬렉션의 모든 게시글을 timestamp 기준으로 내림차순 정렬하여 스트림으로 반환합니다.
+  /// - Firestore의 실시간 snapshots()를 사용하여 변화가 있을 때마다 List<Board> 갱신.
+  /// - 각 도큐먼트는 Board.fromFirestore를 이용해 변환함.
+  ///
+  /// 사용 예: 게시판 목록 화면 등에 실시간 반영 가능
   Stream<List<Board>> getPostsStream() => _db
       .collection(_boardCollection)
       .orderBy('timestamp', descending: true)
@@ -184,4 +201,53 @@ class AuthService {
         (snapshot) =>
             snapshot.docs.map((doc) => Board.fromFirestore(doc.data(), doc.id)).toList(),
       );
+
+  /// 새 게시글(Board) 데이터를 Firestore에 추가
+  ///
+  /// 상세 기능:
+  /// - boards 컬렉션에 Board 객체의 데이터를 추가합니다.
+  /// - 실패 시 예외를 캡처하여 debugPrint로 출력합니다(에러 처리는 별도로 필요할 수 있음).
+  Future<void> addBoard(Board board) async {
+    try {
+      await _db.collection(_boardCollection).add(board.toFirestore());
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// 기존 게시글(Board)을 Firestore에서 수정
+  ///
+  /// 상세 기능:
+  /// - board.id가 없으면 즉시 예외를 throw하여 중단합니다.
+  /// - 주어진 board.id로 해당 게시글 도큐먼트를 찾아, 데이터를 update합니다.
+  /// - 실패 시 에러 내용을 debugPrint로 출력합니다.
+  Future<void> updateBoard(Board board) async {
+    if (board.id == null) {
+      throw Exception('아이디가 없습니다.');
+    }
+
+    try {
+      await _db.collection(_boardCollection).doc(board.id).update(board.toFirestore());
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// 기존 게시글(Board)을 Firestore에서 삭제
+  ///
+  /// 상세 기능:
+  /// - board.id가 없으면 즉시 예외를 throw하여 중단합니다.
+  /// - 주어진 board.id로 해당 게시글 도큐먼트를 찾아, 삭제합니다.
+  /// - 실패 시 에러 내용을 debugPrint로 출력합니다.
+  Future<void> deleteBoard(Board board) async {
+    if (board.id == null) {
+      throw Exception('아이디가 없습니다.');
+    }
+
+    try {
+      await _db.collection(_boardCollection).doc(board.id).delete();
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 }

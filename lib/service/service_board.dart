@@ -12,6 +12,7 @@ class BoardService {
       return false;
     }
     final Member? member = await AuthService().getUserModelByUid(user);
+
     if (member == null) {
       debugPrint('Member not found for current user');
       return false;
@@ -30,6 +31,35 @@ class BoardService {
       return true;
     } catch (e) {
       debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateBoard({required Board board}) async {
+    try {
+      if (board.id == null) {
+        throw '게시글의 아이디가 존재하지 않습니다.';
+      }
+
+      final userUid = AuthService().firebaseAuth.currentUser?.uid;
+
+      if (board.writerUid.isEmpty || board.writerUid != userUid) {
+        throw '게시글의 등록자와 아이디가 일치하지 않습니다.';
+      }
+
+      await AuthService().updateBoard(board);
+      return true;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> deleteBoard({required Board board}) async {
+    try {
+      await AuthService().deleteBoard(board);
+      return true;
+    } catch (e) {
       return false;
     }
   }
