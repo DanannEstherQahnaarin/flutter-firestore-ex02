@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_mms/common_widget/appbars.dart';
 import 'package:flutter_application_mms/service/service_auth.dart';
 import 'package:flutter_application_mms/views/view_board_add.dart';
+import 'package:flutter_application_mms/views/view_board_detail.dart';
 import 'package:intl/intl.dart';
 
 class BoardPage extends StatelessWidget {
@@ -30,30 +31,32 @@ class BoardPage extends StatelessWidget {
               return ListView.builder(
                 itemCount: boards.length,
                 itemBuilder: (context, index) {
-                  final post = boards[index];
+                  final board = boards[index];
                   // 날짜 포맷을 위해 intl 패키지 사용
-                  final formattedDate = DateFormat('yy/MM/dd HH:mm').format(post.timestamp);
+                  final formattedDate = DateFormat('yy/MM/dd HH:mm').format(board.timestamp);
 
                   return ListTile(
                     title: Text(
-                      post.title,
+                      board.title,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(post.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        Text(board.content, maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 4),
                         Text(
-                          '작성자: ${post.writerNm} | 시간: $formattedDate',
+                          '작성자: ${board.writerNm} | 시간: $formattedDate',
                           style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                     onTap: () {
-                      // TODO: 10단계에서 게시글 상세/수정 페이지로 이동 로직 구현
-                      debugPrint('게시글 선택 ID: ${post.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DetailBoardPage(board: board)),
+                      );
                     },
                   );
                 },

@@ -12,6 +12,7 @@ class AddBordPage extends StatefulWidget {
 }
 
 class _AddBordPageState extends State<AddBordPage> {
+  final formKey = GlobalKey<FormState>();
   final BoardService boardService = BoardService();
   final TextEditingController _txtTitleController = TextEditingController();
   final TextEditingController _txtContentController = TextEditingController();
@@ -22,6 +23,7 @@ class _AddBordPageState extends State<AddBordPage> {
     body: Padding(
       padding: const EdgeInsets.all(10),
       child: Form(
+        key: formKey,
         child: Column(
           children: [
             CustomInputFormField(
