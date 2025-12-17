@@ -147,9 +147,10 @@ Future<void> showDeleteBoardDialog({
             } else {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('수정에 실패하였습니다다.')));
+              ).showSnackBar(const SnackBar(content: Text('삭제에 실패하였습니다다.')));
             }
 
+            Navigator.pop(context);
             Navigator.pop(context);
           },
           child: const Text('OK'),
